@@ -1,5 +1,10 @@
 # Vapor OAuth Fluent
 
+[![Language](https://img.shields.io/badge/Swift-3.1-brightgreen.svg)](http://swift.org)
+[![Build Status](https://travis-ci.org/brokenhandsio/vapor-oauth-fluent.svg?branch=master)](https://travis-ci.org/brokenhandsio/vapor-oauth-fluent)
+[![codecov](https://codecov.io/gh/brokenhandsio/vapor-oauth-fluent/branch/master/graph/badge.svg)](https://codecov.io/gh/brokenhandsio/vapor-oauth-fluent)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/brokenhandsio/vapor-oauth-fluent/master/LICENSE)
+
 This repo contains a Fluent implementations for the required protocols for [Vapor OAuth](https://github.com/brokenhandsio/vapor-oauth).
 
 # Usage
