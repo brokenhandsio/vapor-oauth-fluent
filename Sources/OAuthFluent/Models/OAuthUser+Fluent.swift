@@ -2,8 +2,6 @@ import FluentProvider
 import OAuth
 import AuthProvider
 
-//public final class FluentOAuthUser: OAuthUser, Model {
-
 extension OAuthUser: Model {
 
     struct Properties {
