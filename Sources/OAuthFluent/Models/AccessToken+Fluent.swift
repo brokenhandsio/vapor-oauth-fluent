@@ -65,6 +65,8 @@ extension AccessToken: Preparation {
             builder.date(Properties.expiryTime)
             builder.string(Properties.scopes, optional: true)
         }
+        
+        try database.index(Properties.tokenString, for: AccessToken.self)
     }
     
     public static func revert(_ database: Database) throws {

@@ -60,6 +60,8 @@ extension OAuthCode: Preparation {
             builder.date(Properties.expiryDate)
             builder.string(Properties.scopes, optional: true)
         }
+        
+        try database.index(Properties.codeString, for: OAuthCode.self)
     }
     
     public static func revert(_ database: Database) throws {

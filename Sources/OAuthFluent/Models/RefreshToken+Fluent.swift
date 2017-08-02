@@ -61,6 +61,8 @@ extension RefreshToken: Preparation {
             builder.string(Properties.userID, optional: true)
             builder.string(Properties.scopes, optional: true)
         }
+        
+//        try database.index(Properties.tokenString, for: RefreshToken.self)
     }
     
     public static func revert(_ database: Database) throws {

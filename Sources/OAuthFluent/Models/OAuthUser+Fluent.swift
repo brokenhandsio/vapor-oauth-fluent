@@ -53,6 +53,8 @@ extension OAuthUser: Preparation {
             builder.string(Properties.password)
             builder.string(Properties.emailAddress, optional: true)
         }
+        
+        try database.index(Properties.userID, for: OAuthUser.self)
     }
     
     public static func revert(_ database: Database) throws {

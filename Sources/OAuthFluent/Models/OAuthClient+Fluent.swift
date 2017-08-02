@@ -101,6 +101,8 @@ extension OAuthClient: Preparation {
             builder.bool(Properties.firstParty)
             builder.string(Properties.allowGrantTypes, optional: true)
         }
+        
+        try database.index(Properties.clientID, for: OAuthClient.self)
     }
     
     public static func revert(_ database: Database) throws {
