@@ -28,7 +28,7 @@ class OAuthFluentTests: XCTestCase {
     let username = "han"
     let password = "leia"
     var user: FluentOAuthUser!
-    var oauthClient: FluentOAuthClient!
+    var oauthClient: OAuthClient!
     
     // MARK: - Overrides
     
@@ -46,7 +46,7 @@ class OAuthFluentTests: XCTestCase {
         try! config.set("droplet.middleware", ["error", "sessions"])
         try! config.set("droplet.commands", ["prepare"])
         
-        config.preparations.append(FluentOAuthClient.self)
+        config.preparations.append(OAuthClient.self)
         config.preparations.append(FluentOAuthUser.self)
         config.preparations.append(FluentOAuthCode.self)
         config.preparations.append(FluentAccessToken.self)
@@ -61,7 +61,7 @@ class OAuthFluentTests: XCTestCase {
         user = FluentOAuthUser(username: username, emailAddress: email, password: passwordHash)
         try! user.save()
         
-        oauthClient = FluentOAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
+        oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
         
         try! oauthClient.save()
     }
