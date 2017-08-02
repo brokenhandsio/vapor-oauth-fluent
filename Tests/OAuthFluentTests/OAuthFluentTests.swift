@@ -22,6 +22,7 @@ class OAuthFluentTests: XCTestCase {
     let capturingAuthHandler = CapturingAuthHandler()
     let scope = "email"
     let redirectURI = "https://api.brokenhands.io/callback"
+    let clientID = "ABCDEFG"
     let clientSecret = "1234"
     let email = "han@therebelalliance.com"
     let username = "han"
@@ -60,7 +61,8 @@ class OAuthFluentTests: XCTestCase {
         user = FluentOAuthUser(username: username, emailAddress: email, password: passwordHash)
         try! user.save()
         
-        oauthClient = FluentOAuthClient(redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
+        oauthClient = FluentOAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
+        
         try! oauthClient.save()
     }
     
@@ -76,9 +78,7 @@ class OAuthFluentTests: XCTestCase {
         #endif
     }
     
-    func testThatAuthCodeFlowWorksAsExpectedWithFluentModels() throws {
-        let clientID = oauthClient.clientID
-        
+    func testThatAuthCodeFlowWorksAsExpectedWithFluentModels() throws {        
         // Get Auth Code
         let state = "jfeiojo382497329"
         
@@ -235,7 +235,7 @@ class OAuthFluentTests: XCTestCase {
         
         var tokenRequestData = Node([:], in: nil)
         try tokenRequestData.set("grant_type", "password")
-        try tokenRequestData.set("client_id", oauthClient.clientID)
+        try tokenRequestData.set("client_id", clientID)
         try tokenRequestData.set("client_secret", clientSecret)
         try tokenRequestData.set("scope", scope)
         try tokenRequestData.set("username", username)
