@@ -8,11 +8,11 @@ public struct FluentUserManager: UserManager {
     
     public func authenticateUser(username: String, password: String) -> String? {
         let credentials = Password(username: username, password: password)
-        let user = try? FluentOAuthUser.authenticate(credentials)
+        let user = try? OAuthUser.authenticate(credentials)
         return user?.userID
     }
     
     public func getUser(id: String) -> OAuthUser? {
-        return (try? FluentOAuthUser.find(id)) ?? nil
+        return (try? OAuthUser.makeQuery().filter(OAuthUser.Properties.userID, id).first()) ?? nil
     }
 }

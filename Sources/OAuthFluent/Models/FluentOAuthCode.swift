@@ -1,7 +1,7 @@
 import OAuth
 import FluentProvider
 
-public final class FluentOAuthCode: OAuthCode, Model {
+extension OAuthCode: Model {
     
     struct Properties {
         static let codeString = "code_string"
@@ -12,9 +12,20 @@ public final class FluentOAuthCode: OAuthCode, Model {
         static let scopes = "scopes"
     }
     
-    public let storage = Storage()
+    public var storage: Storage {
+        get {
+            if let storage = extend["fluent-storage"] as? Storage {
+                return storage
+            }
+            else {
+                let storage = Storage()
+                extend["fluent-storage"] = storage
+                return storage
+            }
+        }
+    }
     
-    public init(row: Row) throws {
+    public convenience init(row: Row) throws {
         let codeString: String = try row.get(Properties.codeString)
         let clientID: String = try row.get(Properties.clientID)
         let redirectURI: String = try row.get(Properties.redirectURI)
@@ -23,11 +34,7 @@ public final class FluentOAuthCode: OAuthCode, Model {
         let scopesString: String? = try? row.get(Properties.scopes)
         let scopes = scopesString?.components(separatedBy: " ")
         
-        super.init(codeID: codeString, clientID: clientID, redirectURI: redirectURI, userID: userID, expiryDate: expiryDate, scopes: scopes)
-    }
-    
-    override public init(codeID: String, clientID: String, redirectURI: String, userID: String, expiryDate: Date, scopes: [String]?) {
-        super.init(codeID: codeID, clientID: clientID, redirectURI: redirectURI, userID: userID, expiryDate: expiryDate, scopes: scopes)
+        self.init(codeID: codeString, clientID: clientID, redirectURI: redirectURI, userID: userID, expiryDate: expiryDate, scopes: scopes)
     }
     
     public func makeRow() throws -> Row {
@@ -42,7 +49,7 @@ public final class FluentOAuthCode: OAuthCode, Model {
     }
 }
 
-extension FluentOAuthCode: Preparation {
+extension OAuthCode: Preparation {
     public static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()

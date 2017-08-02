@@ -24,10 +24,11 @@ class OAuthFluentTests: XCTestCase {
     let redirectURI = "https://api.brokenhands.io/callback"
     let clientID = "ABCDEFG"
     let clientSecret = "1234"
+    let userID = "ABCDEFG1234"
     let email = "han@therebelalliance.com"
     let username = "han"
     let password = "leia"
-    var user: FluentOAuthUser!
+    var user: OAuthUser!
     var oauthClient: OAuthClient!
     
     // MARK: - Overrides
@@ -47,18 +48,18 @@ class OAuthFluentTests: XCTestCase {
         try! config.set("droplet.commands", ["prepare"])
         
         config.preparations.append(OAuthClient.self)
-        config.preparations.append(FluentOAuthUser.self)
-        config.preparations.append(FluentOAuthCode.self)
-        config.preparations.append(FluentAccessToken.self)
-        config.preparations.append(FluentRefreshToken.self)
+        config.preparations.append(OAuthUser.self)
+        config.preparations.append(OAuthCode.self)
+        config.preparations.append(AccessToken.self)
+        config.preparations.append(RefreshToken.self)
         
         drop = try! Droplet(config)
         
         let resourceController = TestResourceController(drop: drop)
         resourceController.addRoutes()
         
-        let passwordHash = try! FluentOAuthUser.passwordHasher.make(password)
-        user = FluentOAuthUser(username: username, emailAddress: email, password: passwordHash)
+        let passwordHash = try! OAuthUser.passwordHasher.make(password)
+        user = OAuthUser(userID: userID, username: username, emailAddress: email, password: passwordHash)
         try! user.save()
         
         oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)

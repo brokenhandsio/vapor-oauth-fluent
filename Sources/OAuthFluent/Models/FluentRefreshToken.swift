@@ -2,7 +2,7 @@ import FluentProvider
 import OAuth
 import Foundation
 
-public final class FluentRefreshToken: RefreshToken, Model {
+extension RefreshToken: Model {
     
     struct Properties {
         static let tokenString = "token_string"
@@ -11,9 +11,20 @@ public final class FluentRefreshToken: RefreshToken, Model {
         static let scopes = "scopes"
     }
     
-    public let storage = Storage()
+    public var storage: Storage {
+        get {
+            if let storage = extend["fluent-storage"] as? Storage {
+                return storage
+            }
+            else {
+                let storage = Storage()
+                extend["fluent-storage"] = storage
+                return storage
+            }
+        }
+    }
     
-    public init(row: Row) throws {
+    public convenience init(row: Row) throws {
         let tokenString: String = try row.get(Properties.tokenString)
         let clientID: String = try row.get(Properties.clientID)
         let userID: String? = try? row.get(Properties.userID)
@@ -28,11 +39,7 @@ public final class FluentRefreshToken: RefreshToken, Model {
             scopes = nil
         }
         
-        super.init(tokenString: tokenString, clientID: clientID, userID: userID, scopes: scopes)
-    }
-    
-    override public init(tokenString: String, clientID: String, userID: String?, scopes: [String]?) {
-        super.init(tokenString: tokenString, clientID: clientID, userID: userID, scopes: scopes)
+        self.init(tokenString: tokenString, clientID: clientID, userID: userID, scopes: scopes)
     }
     
     public func makeRow() throws -> Row {
@@ -45,7 +52,7 @@ public final class FluentRefreshToken: RefreshToken, Model {
     }
 }
 
-extension FluentRefreshToken: Preparation {
+extension RefreshToken: Preparation {
     public static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
