@@ -5,7 +5,7 @@ import Foundation
 extension RefreshToken: Model {
     
     struct Properties {
-        static let tokenString = "token_string"
+        static let tokenString = "refresh_token_string"
         static let clientID = "client_id"
         static let userID = "user_id"
         static let scopes = "scopes"
@@ -62,7 +62,7 @@ extension RefreshToken: Preparation {
             builder.string(Properties.scopes, optional: true)
         }
         
-//        try database.index(Properties.tokenString, for: RefreshToken.self)
+        try database.index(Properties.tokenString, for: RefreshToken.self)
     }
     
     public static func revert(_ database: Database) throws {
