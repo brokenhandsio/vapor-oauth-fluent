@@ -67,6 +67,10 @@ class OAuthFluentTests: XCTestCase {
         try! oauthClient.save()
     }
     
+    override func tearDown() {
+        try! drop.database?.revertAll([OAuthClient.self, OAuthUser.self, OAuthCode.self, AccessToken.self, RefreshToken.self])
+    }
+    
     // MARK: - Tests
     
     // Courtesy of https://oleb.net/blog/2017/03/keeping-xctest-in-sync/
