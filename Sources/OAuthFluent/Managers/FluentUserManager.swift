@@ -6,13 +6,13 @@ public struct FluentUserManager: UserManager {
     
     public init() {}
     
-    public func authenticateUser(username: String, password: String) -> String? {
+    public func authenticateUser(username: String, password: String) -> Identifier? {
         let credentials = Password(username: username, password: password)
-        let user = try? FluentOAuthUser.authenticate(credentials)
-        return user?.userID
+        let user = try? OAuthUser.authenticate(credentials)
+        return user?.id
     }
     
-    public func getUser(id: String) -> OAuthUser? {
-        return (try? FluentOAuthUser.find(id)) ?? nil
+    public func getUser(id: Identifier) -> OAuthUser? {
+        return (try? OAuthUser.find(id)) ?? nil
     }
 }

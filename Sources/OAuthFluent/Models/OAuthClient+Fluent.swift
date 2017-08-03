@@ -1,8 +1,8 @@
 import OAuth
 import FluentProvider
 
-public final class FluentOAuthClient: OAuthClient, Model {
-    
+extension OAuthClient: Model {
+
     struct Properties {
         static let clientID = "client_id"
         static let clientSecret = "client_secret"
@@ -13,9 +13,20 @@ public final class FluentOAuthClient: OAuthClient, Model {
         static let allowGrantTypes = "allowed_grant_types"
     }
     
-    public let storage = Storage()
+    public var storage: Storage {
+        get {
+            if let storage = extend["fluent-storage"] as? Storage {
+                return storage
+            }
+            else {
+                let storage = Storage()
+                extend["fluent-storage"] = storage
+                return storage
+            }
+        }
+    }
     
-    public init(row: Row) throws {
+    public convenience init(row: Row) throws {
         let clientID: String = try row.get(Properties.clientID)
         let clientSecret: String? = try? row.get(Properties.clientSecret)
         let redirectURIsString: String? = try? row.get(Properties.redirectURIs)
@@ -58,12 +69,7 @@ public final class FluentOAuthClient: OAuthClient, Model {
             allowedGrantTypes = nil
         }
         
-        super.init(clientID: clientID, redirectURIs: redirectURIs, clientSecret: clientSecret, validScopes: scopes, confidential: confidentalClient, firstParty: firstParty, allowedGrantTypes: allowedGrantTypes)
-    }
-    
-    
-    public override init(clientID: String, redirectURIs: [String]?, clientSecret: String? = nil, validScopes: [String]? = nil, confidential: Bool? = nil, firstParty: Bool = false, allowedGrantTypes: [OAuthFlowType]? = nil) {
-        super.init(clientID: clientID, redirectURIs: redirectURIs, clientSecret: clientSecret, validScopes: validScopes, confidential: confidential, firstParty: firstParty, allowedGrantTypes: allowedGrantTypes)
+        self.init(clientID: clientID, redirectURIs: redirectURIs, clientSecret: clientSecret, validScopes: scopes, confidential: confidentalClient, firstParty: firstParty, allowedGrantTypes: allowedGrantTypes)
     }
     
     public func makeRow() throws -> Row {
@@ -83,7 +89,7 @@ public final class FluentOAuthClient: OAuthClient, Model {
     }
 }
 
-extension FluentOAuthClient: Preparation {
+extension OAuthClient: Preparation {
     public static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
@@ -95,6 +101,8 @@ extension FluentOAuthClient: Preparation {
             builder.bool(Properties.firstParty)
             builder.string(Properties.allowGrantTypes, optional: true)
         }
+        
+        try database.index(Properties.clientID, for: OAuthClient.self)
     }
     
     public static func revert(_ database: Database) throws {

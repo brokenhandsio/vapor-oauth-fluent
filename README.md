@@ -34,13 +34,13 @@ You can choose which implementations to use, or write your custom ones. For inst
 
 # Models Included
 
-The following models are included with this repository:
+The following models have Fluent extensions included with this repository:
 
-* FluentAccessToken
-* FluentRefreshToken
-* FluentOAuthCode
-* FluentOAuthUser
-* FluentOAuthClient
+* AccessToken
+* RefreshToken
+* OAuthCode
+* OAuthUser
+* OAuthClient
 
 **Note** you will need to add these models to your preparations if you wish to use any of these.
 

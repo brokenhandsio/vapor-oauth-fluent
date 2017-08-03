@@ -27,8 +27,8 @@ class OAuthFluentTests: XCTestCase {
     let email = "han@therebelalliance.com"
     let username = "han"
     let password = "leia"
-    var user: FluentOAuthUser!
-    var oauthClient: FluentOAuthClient!
+    var user: OAuthUser!
+    var oauthClient: OAuthClient!
     
     // MARK: - Overrides
     
@@ -46,24 +46,28 @@ class OAuthFluentTests: XCTestCase {
         try! config.set("droplet.middleware", ["error", "sessions"])
         try! config.set("droplet.commands", ["prepare"])
         
-        config.preparations.append(FluentOAuthClient.self)
-        config.preparations.append(FluentOAuthUser.self)
-        config.preparations.append(FluentOAuthCode.self)
-        config.preparations.append(FluentAccessToken.self)
-        config.preparations.append(FluentRefreshToken.self)
+        config.preparations.append(OAuthClient.self)
+        config.preparations.append(OAuthUser.self)
+        config.preparations.append(OAuthCode.self)
+        config.preparations.append(AccessToken.self)
+        config.preparations.append(RefreshToken.self)
         
         drop = try! Droplet(config)
         
         let resourceController = TestResourceController(drop: drop)
         resourceController.addRoutes()
         
-        let passwordHash = try! FluentOAuthUser.passwordHasher.make(password)
-        user = FluentOAuthUser(username: username, emailAddress: email, password: passwordHash)
+        let passwordHash = try! OAuthUser.passwordHasher.make(password)
+        user = OAuthUser(username: username, emailAddress: email, password: passwordHash)
         try! user.save()
         
-        oauthClient = FluentOAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
+        oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
         
         try! oauthClient.save()
+    }
+    
+    override func tearDown() {
+        try! drop.database?.revertAll([OAuthClient.self, OAuthUser.self, OAuthCode.self, AccessToken.self, RefreshToken.self])
     }
     
     // MARK: - Tests
@@ -225,7 +229,7 @@ class OAuthFluentTests: XCTestCase {
         
         XCTAssertEqual(userResponse.status, .ok)
         
-        XCTAssertEqual(userResponse.json?["userID"]?.string, user.userID)
+        XCTAssertEqual(userResponse.json?["userID"]?.string, user.id?.string)
         XCTAssertEqual(userResponse.json?["username"]?.string, username)
         XCTAssertEqual(userResponse.json?["email"]?.string, email)
     }
@@ -268,7 +272,7 @@ class OAuthFluentTests: XCTestCase {
         
         XCTAssertEqual(userResponse.status, .ok)
         
-        XCTAssertEqual(userResponse.json?["userID"]?.string, user.userID)
+        XCTAssertEqual(userResponse.json?["userID"]?.string, user.id?.string)
         XCTAssertEqual(userResponse.json?["username"]?.string, username)
         XCTAssertEqual(userResponse.json?["email"]?.string, email)
     }
@@ -318,7 +322,7 @@ struct TestResourceController {
     func getOAuthUser(request: Request) throws -> ResponseRepresentable {
         let user: OAuthUser = try request.oauth.user()
         var json = JSON()
-        try json.set("userID", user.userID)
+        try json.set("userID", user.id?.string)
         try json.set("email", user.emailAddress)
         try json.set("username", user.username)
         

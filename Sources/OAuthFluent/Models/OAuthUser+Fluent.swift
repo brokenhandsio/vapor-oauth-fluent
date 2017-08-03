@@ -2,25 +2,32 @@ import FluentProvider
 import OAuth
 import AuthProvider
 
-public final class FluentOAuthUser: OAuthUser, Model {
-    
+extension OAuthUser: Model {
+
     struct Properties {
         static let username = "username"
         static let emailAddress = "email_address"
         static let password = "password"
     }
     
-    public let storage = Storage()
-    
-    public init(username: String, emailAddress: String, password: Bytes) {
-        super.init(userID: nil, username: username, emailAddress: emailAddress, password: password)
+    public var storage: Storage {
+        get {
+            if let storage = extend["fluent-storage"] as? Storage {
+                return storage
+            }
+            else {
+                let storage = Storage()
+                extend["fluent-storage"] = storage
+                return storage
+            }
+        }
     }
     
-    required public init(row: Row) throws {
+    public convenience init(row: Row) throws {
         let username: String = try row.get(Properties.username)
         let emailAddress: String? = try? row.get(Properties.emailAddress)
         let passwordAsString: String = try row.get(Properties.password)
-        super.init(userID: nil, username: username, emailAddress: emailAddress, password: passwordAsString.makeBytes())
+        self.init(username: username, emailAddress: emailAddress, password: passwordAsString.makeBytes())
     }
     
     public func makeRow() throws -> Row {
@@ -32,25 +39,9 @@ public final class FluentOAuthUser: OAuthUser, Model {
         
         return row
     }
-    
-    override public var userID: String? {
-        get {
-            guard let storageIDNode = try? id.makeNode(in: nil), let storageID = storageIDNode.string else {
-                return "IDENTIFIER"
-            }
-            
-            return storageID
-        }
-        set {
-            if let newID = newValue {
-                self.id = Identifier(newID)
-            }
-        }
-        
-    }
 }
 
-extension FluentOAuthUser: Preparation {
+extension OAuthUser: Preparation {
     public static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
@@ -65,15 +56,15 @@ extension FluentOAuthUser: Preparation {
     }
 }
 
-extension FluentOAuthUser: SessionPersistable {}
+extension OAuthUser: SessionPersistable {}
 
 public protocol PasswordHasherVerifier: PasswordVerifier, HashProtocol {}
 
 extension BCryptHasher: PasswordHasherVerifier {}
 
-extension FluentOAuthUser: PasswordAuthenticatable {
+extension OAuthUser: PasswordAuthenticatable {
     public static let usernameKey = "username"
-    public static let passwordVerifier: PasswordVerifier? = FluentOAuthUser.passwordHasher
+    public static let passwordVerifier: PasswordVerifier? = OAuthUser.passwordHasher
     public var hashedPassword: String? {
         return password.makeString()
     }
