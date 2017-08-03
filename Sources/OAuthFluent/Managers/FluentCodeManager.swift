@@ -6,7 +6,7 @@ public struct FluentCodeManager: CodeManager {
     
     public init() {}
     
-    public func generateCode(userID: String, clientID: String, redirectURI: String, scopes: [String]?) throws -> String {
+    public func generateCode(userID: Identifier, clientID: String, redirectURI: String, scopes: [String]?) throws -> String {
         let codeString = try Random.bytes(count: 32).hexString
         let fluentCode = OAuthCode(codeID: codeString, clientID: clientID, redirectURI: redirectURI, userID: userID, expiryDate: Date().addingTimeInterval(60), scopes: scopes)
         try fluentCode.save()

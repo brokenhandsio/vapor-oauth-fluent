@@ -23,14 +23,14 @@ public struct FluentTokenManager: TokenManager {
         }
     }
     
-    public func generateAccessToken(clientID: String, userID: String?, scopes: [String]?, expiryTime: Int) throws -> AccessToken {
+    public func generateAccessToken(clientID: String, userID: Identifier?, scopes: [String]?, expiryTime: Int) throws -> AccessToken {
         let accessTokenString = try Random.bytes(count: 32).hexString
         let accessToken = AccessToken(tokenString: accessTokenString, clientID: clientID, userID: userID, scopes: scopes, expiryTime: Date().addingTimeInterval(TimeInterval(expiryTime)))
         try accessToken.save()
         return accessToken
     }
     
-    public func generateAccessRefreshTokens(clientID: String, userID: String?, scopes: [String]?, accessTokenExpiryTime: Int) throws -> (AccessToken, RefreshToken) {
+    public func generateAccessRefreshTokens(clientID: String, userID: Identifier?, scopes: [String]?, accessTokenExpiryTime: Int) throws -> (AccessToken, RefreshToken) {
         let accessTokenString = try Random.bytes(count: 32).hexString
         let accessToken = AccessToken(tokenString: accessTokenString, clientID: clientID, userID: userID, scopes: scopes, expiryTime: Date().addingTimeInterval(TimeInterval(accessTokenExpiryTime)))
         try accessToken.save()

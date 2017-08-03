@@ -27,7 +27,7 @@ extension RefreshToken: Model {
     public convenience init(row: Row) throws {
         let tokenString: String = try row.get(Properties.tokenString)
         let clientID: String = try row.get(Properties.clientID)
-        let userID: String? = try? row.get(Properties.userID)
+        let userID: Identifier? = try? row.get(Properties.userID)
         let scopesString: String? = try? row.get(Properties.scopes)
         
         let scopes: [String]?

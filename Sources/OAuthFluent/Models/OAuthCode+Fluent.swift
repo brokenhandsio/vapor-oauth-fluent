@@ -29,7 +29,7 @@ extension OAuthCode: Model {
         let codeString: String = try row.get(Properties.codeString)
         let clientID: String = try row.get(Properties.clientID)
         let redirectURI: String = try row.get(Properties.redirectURI)
-        let userID: String = try row.get(Properties.userID)
+        let userID: Identifier = try row.get(Properties.userID)
         let expiryDate: Date = try row.get(Properties.expiryDate)
         let scopesString: String? = try? row.get(Properties.scopes)
         let scopes = scopesString?.components(separatedBy: " ")

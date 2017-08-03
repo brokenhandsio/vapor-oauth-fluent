@@ -24,7 +24,6 @@ class OAuthFluentTests: XCTestCase {
     let redirectURI = "https://api.brokenhands.io/callback"
     let clientID = "ABCDEFG"
     let clientSecret = "1234"
-    let userID = "ABCDEFG1234"
     let email = "han@therebelalliance.com"
     let username = "han"
     let password = "leia"
@@ -59,7 +58,7 @@ class OAuthFluentTests: XCTestCase {
         resourceController.addRoutes()
         
         let passwordHash = try! OAuthUser.passwordHasher.make(password)
-        user = OAuthUser(userID: userID, username: username, emailAddress: email, password: passwordHash)
+        user = OAuthUser(username: username, emailAddress: email, password: passwordHash)
         try! user.save()
         
         oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
@@ -230,7 +229,7 @@ class OAuthFluentTests: XCTestCase {
         
         XCTAssertEqual(userResponse.status, .ok)
         
-        XCTAssertEqual(userResponse.json?["userID"]?.string, user.userID)
+        XCTAssertEqual(userResponse.json?["userID"]?.string, user.id?.string)
         XCTAssertEqual(userResponse.json?["username"]?.string, username)
         XCTAssertEqual(userResponse.json?["email"]?.string, email)
     }
@@ -273,7 +272,7 @@ class OAuthFluentTests: XCTestCase {
         
         XCTAssertEqual(userResponse.status, .ok)
         
-        XCTAssertEqual(userResponse.json?["userID"]?.string, user.userID)
+        XCTAssertEqual(userResponse.json?["userID"]?.string, user.id?.string)
         XCTAssertEqual(userResponse.json?["username"]?.string, username)
         XCTAssertEqual(userResponse.json?["email"]?.string, email)
     }
@@ -323,7 +322,7 @@ struct TestResourceController {
     func getOAuthUser(request: Request) throws -> ResponseRepresentable {
         let user: OAuthUser = try request.oauth.user()
         var json = JSON()
-        try json.set("userID", user.userID)
+        try json.set("userID", user.id?.string)
         try json.set("email", user.emailAddress)
         try json.set("username", user.username)
         
