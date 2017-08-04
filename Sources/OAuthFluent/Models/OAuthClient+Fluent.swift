@@ -62,7 +62,8 @@ extension OAuthClient: Model {
             allowedGrantTypes = nil
         }
 
-        self.init(clientID: clientID, redirectURIs: redirectURIs, clientSecret: clientSecret, validScopes: scopes, confidential: confidentalClient, firstParty: firstParty, allowedGrantTypes: allowedGrantTypes)
+        self.init(clientID: clientID, redirectURIs: redirectURIs, clientSecret: clientSecret, validScopes: scopes,
+                  confidential: confidentalClient, firstParty: firstParty, allowedGrantTypes: allowedGrantTypes)
     }
 
     public func makeRow() throws -> Row {

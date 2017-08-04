@@ -8,7 +8,8 @@ public struct FluentCodeManager: CodeManager {
 
     public func generateCode(userID: Identifier, clientID: String, redirectURI: String, scopes: [String]?) throws -> String {
         let codeString = try Random.bytes(count: 32).hexString
-        let fluentCode = OAuthCode(codeID: codeString, clientID: clientID, redirectURI: redirectURI, userID: userID, expiryDate: Date().addingTimeInterval(60), scopes: scopes)
+        let fluentCode = OAuthCode(codeID: codeString, clientID: clientID, redirectURI: redirectURI, userID: userID,
+                                   expiryDate: Date().addingTimeInterval(60), scopes: scopes)
         try fluentCode.save()
         return codeString
     }
