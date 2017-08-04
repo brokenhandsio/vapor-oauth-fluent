@@ -12,14 +12,12 @@ extension RefreshToken: Model {
     }
 
     public var storage: Storage {
-        get {
-            if let storage = extend["fluent-storage"] as? Storage {
-                return storage
-            } else {
-                let storage = Storage()
-                extend["fluent-storage"] = storage
-                return storage
-            }
+        if let storage = extend["fluent-storage"] as? Storage {
+            return storage
+        } else {
+            let storage = Storage()
+            extend["fluent-storage"] = storage
+            return storage
         }
     }
 
