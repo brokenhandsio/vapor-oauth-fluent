@@ -2,7 +2,7 @@ import OAuth
 import FluentProvider
 
 extension OAuthCode: Model {
-    
+
     struct Properties {
         static let codeString = "code_string"
         static let clientID = "client_id"
@@ -11,20 +11,19 @@ extension OAuthCode: Model {
         static let expiryDate = "expiry_date"
         static let scopes = "scopes"
     }
-    
+
     public var storage: Storage {
         get {
             if let storage = extend["fluent-storage"] as? Storage {
                 return storage
-            }
-            else {
+            } else {
                 let storage = Storage()
                 extend["fluent-storage"] = storage
                 return storage
             }
         }
     }
-    
+
     public convenience init(row: Row) throws {
         let codeString: String = try row.get(Properties.codeString)
         let clientID: String = try row.get(Properties.clientID)
@@ -33,10 +32,10 @@ extension OAuthCode: Model {
         let expiryDate: Date = try row.get(Properties.expiryDate)
         let scopesString: String? = try? row.get(Properties.scopes)
         let scopes = scopesString?.components(separatedBy: " ")
-        
+
         self.init(codeID: codeString, clientID: clientID, redirectURI: redirectURI, userID: userID, expiryDate: expiryDate, scopes: scopes)
     }
-    
+
     public func makeRow() throws -> Row {
         var row = Row()
         try row.set(Properties.codeString, codeID)
@@ -60,10 +59,10 @@ extension OAuthCode: Preparation {
             builder.date(Properties.expiryDate)
             builder.string(Properties.scopes, optional: true)
         }
-        
+
         try database.index(Properties.codeString, for: OAuthCode.self)
     }
-    
+
     public static func revert(_ database: Database) throws {
         try database.delete(self)
     }

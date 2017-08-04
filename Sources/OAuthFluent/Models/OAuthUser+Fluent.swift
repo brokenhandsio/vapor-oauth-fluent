@@ -9,34 +9,33 @@ extension OAuthUser: Model {
         static let emailAddress = "email_address"
         static let password = "password"
     }
-    
+
     public var storage: Storage {
         get {
             if let storage = extend["fluent-storage"] as? Storage {
                 return storage
-            }
-            else {
+            } else {
                 let storage = Storage()
                 extend["fluent-storage"] = storage
                 return storage
             }
         }
     }
-    
+
     public convenience init(row: Row) throws {
         let username: String = try row.get(Properties.username)
         let emailAddress: String? = try? row.get(Properties.emailAddress)
         let passwordAsString: String = try row.get(Properties.password)
         self.init(username: username, emailAddress: emailAddress, password: passwordAsString.makeBytes())
     }
-    
+
     public func makeRow() throws -> Row {
         var row = Row()
-        
+
         try row.set(Properties.username, username)
         try row.set(Properties.password, password.makeString())
         try row.set(Properties.emailAddress, emailAddress)
-        
+
         return row
     }
 }
@@ -50,7 +49,7 @@ extension OAuthUser: Preparation {
             builder.string(Properties.emailAddress, optional: true)
         }
     }
-    
+
     public static func revert(_ database: Database) throws {
         try database.delete(self)
     }
