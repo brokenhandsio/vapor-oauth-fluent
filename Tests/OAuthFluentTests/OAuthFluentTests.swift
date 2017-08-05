@@ -280,6 +280,7 @@ class OAuthFluentTests: XCTestCase {
 }
 
 class CapturingAuthHandler: AuthorizeHandler {
+
     func handleAuthorizationError(_ errorType: AuthorizationError) throws -> ResponseRepresentable {
         return "ERROR"
     }
@@ -291,14 +292,14 @@ class CapturingAuthHandler: AuthorizeHandler {
     private(set) var scope: [String]?
     private(set) var state: String?
     private(set) var csrfToken: String?
-    func handleAuthorizationRequest(_ request: Request, responseType: String, clientID: String, redirectURI: URI, scope: [String], state: String?, csrfToken: String) throws -> ResponseRepresentable {
+    func handleAuthorizationRequest(_ request: Request, authorizationRequestObject: AuthorizationRequestObject) throws -> ResponseRepresentable {
         self.request = request
-        self.responseType = responseType
-        self.clientID = clientID
-        self.redirectURI = redirectURI
-        self.scope = scope
-        self.state = state
-        self.csrfToken = csrfToken
+        self.responseType = authorizationRequestObject.responseType
+        self.clientID = authorizationRequestObject.clientID
+        self.redirectURI = authorizationRequestObject.redirectURI
+        self.scope = authorizationRequestObject.scope
+        self.state = authorizationRequestObject.state
+        self.csrfToken = authorizationRequestObject.csrfToken
         return "ALLOW"
     }
 }

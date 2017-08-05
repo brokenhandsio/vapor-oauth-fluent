@@ -12,7 +12,7 @@ public struct FluentUserManager: UserManager {
         return user?.id
     }
 
-    public func getUser(id: Identifier) -> OAuthUser? {
-        return (try? OAuthUser.find(id)) ?? nil
+    public func getUser(userID: Identifier) -> OAuthUser? {
+        return (try? OAuthUser.find(userID)) ?? nil
     }
 }
