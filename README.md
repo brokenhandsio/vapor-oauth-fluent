@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/9938337/29741382-4aeaa670-8a63-11e7-8330-583ce2858fdc.png" alt=“Vapor OAuth Fluent“>
+    <img src="https://user-images.githubusercontent.com/9938337/29741382-4aeaa670-8a63-11e7-8330-583ce2858fdc.png" alt="Vapor OAuth Fluent">
 </p>
 <h1 align="center">Vapor OAuth Fluent</h1>
 <p align="center">
