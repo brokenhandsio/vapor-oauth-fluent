@@ -155,7 +155,7 @@ class OAuthFluentTests: XCTestCase {
         for queryPart in queryParts {
             if queryPart.hasPrefix("code=") {
                 let codeStartIndex = queryPart.index(queryPart.startIndex, offsetBy: 5)
-                codePart = queryPart.substring(from: codeStartIndex)
+                codePart = String(queryPart[codeStartIndex...])
             }
         }
         
