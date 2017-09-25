@@ -6,7 +6,7 @@ import Sessions
 import FluentProvider
 import Cookies
 
-class OAuthFluentTests: XCTestCase {
+class VaporOAuthFluentTests: XCTestCase {
     // MARK: - All Tests
     
     static var allTests = [
