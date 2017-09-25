@@ -1,5 +1,5 @@
 import FluentProvider
-import OAuth
+import VaporOAuth
 import Crypto
 
 public struct FluentCodeManager: CodeManager {

@@ -1,5 +1,5 @@
 import FluentProvider
-import OAuth
+import VaporOAuth
 import Foundation
 
 extension AccessToken: Model {

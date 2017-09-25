@@ -1,6 +1,6 @@
 import XCTest
-import OAuthFluent
-import OAuth
+import VaporOAuthFluent
+import VaporOAuth
 import Vapor
 import Sessions
 import FluentProvider
@@ -33,7 +33,7 @@ class OAuthFluentTests: XCTestCase {
     // MARK: - Overrides
     
     override func setUp() {
-        let provider = OAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: capturingAuthHandler, userManager: FluentUserManager(), validScopes: [scope])
+        let provider = VaporOAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: capturingAuthHandler, userManager: FluentUserManager(), validScopes: [scope])
         
         var config = Config([:])
         
@@ -61,7 +61,7 @@ class OAuthFluentTests: XCTestCase {
         user = OAuthUser(username: username, emailAddress: email, password: passwordHash)
         try! user.save()
         
-        oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
+        oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true, allowedGrantType: .authorization)
         
         try! oauthClient.save()
     }
@@ -77,7 +77,7 @@ class OAuthFluentTests: XCTestCase {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             let thisClass = type(of: self)
             let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass.defaultTestSuite().testCaseCount)
+            let darwinCount = Int(thisClass.defaultTestSuite.testCaseCount)
             XCTAssertEqual(linuxCount, darwinCount, "\(darwinCount - linuxCount) tests are missing from allTests")
         #endif
     }
