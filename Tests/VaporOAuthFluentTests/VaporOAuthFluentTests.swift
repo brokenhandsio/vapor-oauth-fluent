@@ -23,12 +23,14 @@ class OAuthFluentTests: XCTestCase {
     let scope = "email"
     let redirectURI = "https://api.brokenhands.io/callback"
     let clientID = "ABCDEFG"
+    let passwordClientID = "1234567890"
     let clientSecret = "1234"
     let email = "han@therebelalliance.com"
     let username = "han"
     let password = "leia"
     var user: OAuthUser!
     var oauthClient: OAuthClient!
+    var passwordClient: OAuthClient!
     
     // MARK: - Overrides
     
@@ -62,8 +64,10 @@ class OAuthFluentTests: XCTestCase {
         try! user.save()
         
         oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true, allowedGrantType: .authorization)
-        
         try! oauthClient.save()
+        
+        passwordClient = OAuthClient(clientID: passwordClientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true, allowedGrantType: .password)
+        try! passwordClient.save()
     }
     
     override func tearDown() {
@@ -239,7 +243,7 @@ class OAuthFluentTests: XCTestCase {
         
         var tokenRequestData = Node([:], in: nil)
         try tokenRequestData.set("grant_type", "password")
-        try tokenRequestData.set("client_id", clientID)
+        try tokenRequestData.set("client_id", passwordClientID)
         try tokenRequestData.set("client_secret", clientSecret)
         try tokenRequestData.set("scope", scope)
         try tokenRequestData.set("username", username)
