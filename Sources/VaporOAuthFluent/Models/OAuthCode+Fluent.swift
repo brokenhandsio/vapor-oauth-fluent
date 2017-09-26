@@ -1,13 +1,14 @@
+import VaporOAuth
 import FluentProvider
-import OAuth
-import Foundation
 
-extension RefreshToken: Model {
+extension OAuthCode: Model {
 
     struct Properties {
-        static let tokenString = "refresh_token_string"
+        static let codeString = "code_string"
         static let clientID = "client_id"
+        static let redirectURI = "redirect_uri"
         static let userID = "user_id"
+        static let expiryDate = "expiry_date"
         static let scopes = "scopes"
     }
 
@@ -22,43 +23,42 @@ extension RefreshToken: Model {
     }
 
     public convenience init(row: Row) throws {
-        let tokenString: String = try row.get(Properties.tokenString)
+        let codeString: String = try row.get(Properties.codeString)
         let clientID: String = try row.get(Properties.clientID)
-        let userID: Identifier? = try? row.get(Properties.userID)
+        let redirectURI: String = try row.get(Properties.redirectURI)
+        let userID: Identifier = try row.get(Properties.userID)
+        let expiryDate: Date = try row.get(Properties.expiryDate)
         let scopesString: String? = try? row.get(Properties.scopes)
+        let scopes = scopesString?.components(separatedBy: " ")
 
-        let scopes: [String]?
-
-        if let scopesSet = scopesString {
-            scopes = scopesSet.components(separatedBy: " ")
-        } else {
-            scopes = nil
-        }
-
-        self.init(tokenString: tokenString, clientID: clientID, userID: userID, scopes: scopes)
+        self.init(codeID: codeString, clientID: clientID, redirectURI: redirectURI, userID: userID, expiryDate: expiryDate, scopes: scopes)
     }
 
     public func makeRow() throws -> Row {
         var row = Row()
-        try row.set(Properties.tokenString, tokenString)
+        try row.set(Properties.codeString, codeID)
         try row.set(Properties.clientID, clientID)
+        try row.set(Properties.redirectURI, redirectURI)
         try row.set(Properties.userID, userID)
+        try row.set(Properties.expiryDate, expiryDate)
         try row.set(Properties.scopes, scopes?.joined(separator: " "))
         return row
     }
 }
 
-extension RefreshToken: Preparation {
+extension OAuthCode: Preparation {
     public static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
-            builder.string(Properties.tokenString)
+            builder.string(Properties.codeString)
             builder.string(Properties.clientID)
-            builder.string(Properties.userID, optional: true)
+            builder.string(Properties.redirectURI)
+            builder.string(Properties.userID)
+            builder.date(Properties.expiryDate)
             builder.string(Properties.scopes, optional: true)
         }
 
-        try database.index(Properties.tokenString, for: RefreshToken.self)
+        try database.index(Properties.codeString, for: OAuthCode.self)
     }
 
     public static func revert(_ database: Database) throws {

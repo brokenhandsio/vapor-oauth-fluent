@@ -1,12 +1,12 @@
 import XCTest
-import OAuthFluent
-import OAuth
+import VaporOAuthFluent
+import VaporOAuth
 import Vapor
 import Sessions
 import FluentProvider
 import Cookies
 
-class OAuthFluentTests: XCTestCase {
+class VaporOAuthFluentTests: XCTestCase {
     // MARK: - All Tests
     
     static var allTests = [
@@ -23,17 +23,19 @@ class OAuthFluentTests: XCTestCase {
     let scope = "email"
     let redirectURI = "https://api.brokenhands.io/callback"
     let clientID = "ABCDEFG"
+    let passwordClientID = "1234567890"
     let clientSecret = "1234"
     let email = "han@therebelalliance.com"
     let username = "han"
     let password = "leia"
     var user: OAuthUser!
     var oauthClient: OAuthClient!
+    var passwordClient: OAuthClient!
     
     // MARK: - Overrides
     
     override func setUp() {
-        let provider = OAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: capturingAuthHandler, userManager: FluentUserManager(), validScopes: [scope])
+        let provider = VaporOAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: capturingAuthHandler, userManager: FluentUserManager(), validScopes: [scope])
         
         var config = Config([:])
         
@@ -61,9 +63,11 @@ class OAuthFluentTests: XCTestCase {
         user = OAuthUser(username: username, emailAddress: email, password: passwordHash)
         try! user.save()
         
-        oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true)
-        
+        oauthClient = OAuthClient(clientID: clientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true, allowedGrantType: .authorization)
         try! oauthClient.save()
+        
+        passwordClient = OAuthClient(clientID: passwordClientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true, allowedGrantType: .password)
+        try! passwordClient.save()
     }
     
     override func tearDown() {
@@ -77,7 +81,7 @@ class OAuthFluentTests: XCTestCase {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             let thisClass = type(of: self)
             let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass.defaultTestSuite().testCaseCount)
+            let darwinCount = Int(thisClass.defaultTestSuite.testCaseCount)
             XCTAssertEqual(linuxCount, darwinCount, "\(darwinCount - linuxCount) tests are missing from allTests")
         #endif
     }
@@ -155,7 +159,7 @@ class OAuthFluentTests: XCTestCase {
         for queryPart in queryParts {
             if queryPart.hasPrefix("code=") {
                 let codeStartIndex = queryPart.index(queryPart.startIndex, offsetBy: 5)
-                codePart = queryPart.substring(from: codeStartIndex)
+                codePart = String(queryPart[codeStartIndex...])
             }
         }
         
@@ -239,7 +243,7 @@ class OAuthFluentTests: XCTestCase {
         
         var tokenRequestData = Node([:], in: nil)
         try tokenRequestData.set("grant_type", "password")
-        try tokenRequestData.set("client_id", clientID)
+        try tokenRequestData.set("client_id", passwordClientID)
         try tokenRequestData.set("client_secret", clientSecret)
         try tokenRequestData.set("scope", scope)
         try tokenRequestData.set("username", username)

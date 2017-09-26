@@ -1,4 +1,4 @@
-import OAuth
+import VaporOAuth
 import FluentProvider
 
 extension OAuthClient: Model {
@@ -10,7 +10,7 @@ extension OAuthClient: Model {
         static let scopes = "scopes"
         static let confidentialClient = "confidential_client"
         static let firstParty = "first_party"
-        static let allowGrantTypes = "allowed_grant_types"
+        static let allowedGrantType = "allowed_grant_type"
     }
 
     public var storage: Storage {
@@ -30,11 +30,15 @@ extension OAuthClient: Model {
         let scopeString: String? = try row.get(Properties.scopes)
         let confidentalClient: Bool? = try? row.get(Properties.confidentialClient)
         let firstParty: Bool = try row.get(Properties.firstParty)
-        let allowedGrantTypesString: String? = try? row.get(Properties.allowGrantTypes)
+        let allowedGrantTypeString: String = try row.get(Properties.allowedGrantType)
+        let retrievedAllowedGrantType = OAuthFlowType(rawValue: allowedGrantTypeString)
+        
+        guard let allowedGrantType = retrievedAllowedGrantType else {
+            throw Abort.serverError
+        }
 
         let scopes: [String]?
         let redirectURIs: [String]?
-        let allowedGrantTypesAsStrings: [String]?
 
         if let scopeStringSet = scopeString {
             scopes = scopeStringSet.components(separatedBy: " ")
@@ -48,22 +52,8 @@ extension OAuthClient: Model {
             redirectURIs = nil
         }
 
-        if let allowedGrantTypesSet = allowedGrantTypesString {
-            allowedGrantTypesAsStrings = allowedGrantTypesSet.components(separatedBy: " ")
-        } else {
-            allowedGrantTypesAsStrings = nil
-        }
-
-        let allowedGrantTypes: [OAuthFlowType]?
-
-        if let allowedStrings = allowedGrantTypesAsStrings {
-            allowedGrantTypes = allowedStrings.flatMap { OAuthFlowType(rawValue: $0) }
-        } else {
-            allowedGrantTypes = nil
-        }
-
         self.init(clientID: clientID, redirectURIs: redirectURIs, clientSecret: clientSecret, validScopes: scopes,
-                  confidential: confidentalClient, firstParty: firstParty, allowedGrantTypes: allowedGrantTypes)
+                  confidential: confidentalClient, firstParty: firstParty, allowedGrantType: allowedGrantType)
     }
 
     public func makeRow() throws -> Row {
@@ -75,10 +65,8 @@ extension OAuthClient: Model {
         try row.set(Properties.scopes, validScopes?.joined(separator: " "))
         try row.set(Properties.confidentialClient, confidentialClient)
         try row.set(Properties.firstParty, firstParty)
-
-        let allowedGrantTypesString = allowedGrantTypes?.map { $0.rawValue }
-        try row.set(Properties.allowGrantTypes, allowedGrantTypesString?.joined(separator: " "))
-
+        try row.set(Properties.allowedGrantType, allowedGrantType.rawValue)
+        
         return row
     }
 }
@@ -93,7 +81,7 @@ extension OAuthClient: Preparation {
             builder.string(Properties.scopes, optional: true)
             builder.bool(Properties.confidentialClient, optional: true)
             builder.bool(Properties.firstParty)
-            builder.string(Properties.allowGrantTypes, optional: true)
+            builder.string(Properties.allowedGrantType)
         }
 
         try database.index(Properties.clientID, for: OAuthClient.self)

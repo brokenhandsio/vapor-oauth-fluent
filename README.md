@@ -4,7 +4,7 @@
 <h1 align="center">Vapor OAuth Fluent</h1>
 <p align="center">
     <a href="https://swift.org">
-        <img src="http://img.shields.io/badge/Swift-3.1-brightgreen.svg" alt="Language">
+        <img src="http://img.shields.io/badge/Swift-4-brightgreen.svg" alt="Language">
     </a>
     <a href="https://travis-ci.org/brokenhandsio/vapor-oauth-fluent">
         <img src="https://travis-ci.org/brokenhandsio/vapor-oauth-fluent.svg?branch=master" alt="Build Status">
@@ -27,20 +27,20 @@ Vapor OAuth can Fluent be added to your Vapor add with a simple provider. To get
 ```swift
 dependencies: [
     ...,
-    .Package(url: "https://github.com/brokenhandsio/vapor-oauth-fluent", majorVersion: 0)
+    .package(url: "https://github.com/brokenhandsio/vapor-oauth-fluent", .upToNextMajor(from: "0.4.0"))
 ]
 ```
 
 Next import the library into where you set up your `Droplet`:
 
 ```swift
-import OAuthFluent
+import VaporOAuthFluent
 ```
 
 Then choose the implementations you wish to add the provider you add in your `Config`. For example:
 
 ```swift
-try addProvider(OAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: MyAuthHandler(), userManager: FluentUserManager(), validScopes: ["view_profile", "edit_profile"]))
+try addProvider(VaporOAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: MyAuthHandler(), userManager: FluentUserManager(), validScopes: ["view_profile", "edit_profile"]))
 ```
 
 You can choose which implementations to use, or write your custom ones. For instance you may choose to use Fluent for Tokens and Users, but hard code the clients and use JWT to manage Codes.

@@ -1,4 +1,4 @@
-import OAuth
+import VaporOAuth
 import FluentProvider
 
 public struct FluentClientRetriever: ClientRetriever {

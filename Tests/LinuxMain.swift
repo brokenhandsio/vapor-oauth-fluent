@@ -1,10 +1,10 @@
 #if os(Linux)
 
 import XCTest
-@testable import OAuthFluentTests
+@testable import VaporOAuthFluentTests
 
 XCTMain([
-    testCase(OAuthFluentTests.allTests),
+    testCase(VaporOAuthFluentTests.allTests),
 ])
 
 #endif
