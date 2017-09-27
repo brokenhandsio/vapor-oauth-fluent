@@ -40,7 +40,7 @@ import VaporOAuthFluent
 Then choose the implementations you wish to add the provider you add in your `Config`. For example:
 
 ```swift
-try addProvider(VaporOAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: MyAuthHandler(), userManager: FluentUserManager(), validScopes: ["view_profile", "edit_profile"]))
+try addProvider(VaporOAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: MyAuthHandler(), userManager: FluentUserManager(), validScopes: ["view_profile", "edit_profile"], resourceServerRetriever: FluentResourceServerRetriever()))
 ```
 
 You can choose which implementations to use, or write your custom ones. For instance you may choose to use Fluent for Tokens and Users, but hard code the clients and use JWT to manage Codes.
@@ -54,6 +54,7 @@ The following models have Fluent extensions included with this repository:
 * OAuthCode
 * OAuthUser
 * OAuthClient
+* OAuthResourceServer
 
 **Note** you will need to add these models to your preparations if you wish to use any of these.
 
@@ -65,3 +66,4 @@ As well as models, Vapor OAuth Fluent includes implementations for the Managers 
 * FluentCodeManager
 * FluentTokenManager
 * FluentUserManager
+* FluentResourceServerRetriever
