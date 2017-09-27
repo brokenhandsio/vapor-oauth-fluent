@@ -13,6 +13,7 @@ class VaporOAuthFluentTests: XCTestCase {
         ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
         ("testThatAuthCodeFlowWorksAsExpectedWithFluentModels", testThatAuthCodeFlowWorksAsExpectedWithFluentModels),
         ("testThatPasswordCredentialsWorksAsExpectedWithFluentModel", testThatPasswordCredentialsWorksAsExpectedWithFluentModel),
+        ("testThatRemoteTokenIntrospectWorksAsExpectedWithFluentModel", testThatRemoteTokenIntrospectWorksAsExpectedWithFluentModel),
         ]
     
     
@@ -31,11 +32,12 @@ class VaporOAuthFluentTests: XCTestCase {
     var user: OAuthUser!
     var oauthClient: OAuthClient!
     var passwordClient: OAuthClient!
+    var resourceServer: OAuthResourceServer!
     
     // MARK: - Overrides
     
     override func setUp() {
-        let provider = VaporOAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: capturingAuthHandler, userManager: FluentUserManager(), validScopes: [scope])
+        let provider = VaporOAuth.Provider(codeManager: FluentCodeManager(), tokenManager: FluentTokenManager(), clientRetriever: FluentClientRetriever(), authorizeHandler: capturingAuthHandler, userManager: FluentUserManager(), validScopes: [scope], resourceServerRetriever: FluentResourceServerRetriever())
         
         var config = Config([:])
         
@@ -53,6 +55,7 @@ class VaporOAuthFluentTests: XCTestCase {
         config.preparations.append(OAuthCode.self)
         config.preparations.append(AccessToken.self)
         config.preparations.append(RefreshToken.self)
+        config.preparations.append(OAuthResourceServer.self)
         
         drop = try! Droplet(config)
         
@@ -68,6 +71,9 @@ class VaporOAuthFluentTests: XCTestCase {
         
         passwordClient = OAuthClient(clientID: passwordClientID, redirectURIs: [redirectURI], clientSecret: clientSecret, validScopes: [scope], confidential: true, firstParty: true, allowedGrantType: .password)
         try! passwordClient.save()
+
+        resourceServer = OAuthResourceServer(username: username, password: password.makeBytes())
+        try! resourceServer.save()
     }
     
     override func tearDown() {
@@ -281,6 +287,37 @@ class VaporOAuthFluentTests: XCTestCase {
         XCTAssertEqual(userResponse.json?["email"]?.string, email)
     }
 
+    func testThatRemoteTokenIntrospectWorksAsExpectedWithFluentModel() throws {
+        let tokenString = "ABCDEFGH"
+        let expiryDate = Date().addingTimeInterval(3600)
+        let token = AccessToken(tokenString: tokenString, clientID: clientID, userID: user.id, scopes: [scope], expiryTime: expiryDate)
+        try token.save()
+
+        let credentials = "\(username):\(password)".makeBytes().base64Encoded.makeString()
+        let authHeader = "Basic \(credentials)"
+
+        let request = Request(method: .post, uri: "/oauth/token_info")
+        request.headers[.authorization] = authHeader
+
+        var json = JSON()
+        try json.set("token", tokenString)
+        request.json = json
+
+        let response = try drop.respond(to: request)
+
+        XCTAssertEqual(response.status, .ok)
+
+        guard let responseJSON = response.json else {
+            XCTFail()
+            return
+        }
+
+        XCTAssertEqual(responseJSON["active"]?.bool, true)
+        XCTAssertEqual(responseJSON["exp"]?.int, Int(expiryDate.timeIntervalSince1970))
+        XCTAssertEqual(responseJSON["username"]?.string, username)
+        XCTAssertEqual(responseJSON["client_id"]?.string, clientID)
+        XCTAssertEqual(responseJSON["scope"]?.string, scope)
+    }
 }
 
 class CapturingAuthHandler: AuthorizeHandler {
