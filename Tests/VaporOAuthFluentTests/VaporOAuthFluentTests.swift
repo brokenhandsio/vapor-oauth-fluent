@@ -317,6 +317,16 @@ class VaporOAuthFluentTests: XCTestCase {
         XCTAssertEqual(responseJSON["username"]?.string, username)
         XCTAssertEqual(responseJSON["client_id"]?.string, clientID)
         XCTAssertEqual(responseJSON["scope"]?.string, scope)
+
+        let failingRequest = Request(method: .post, uri: "/oauth/token_info")
+        let wrongCredentials = "unknown:\(password)".makeBytes().base64Encoded.makeString()
+        let wongAuthHeader = "Basic \(wrongCredentials)"
+
+        failingRequest.headers[.authorization] = wongAuthHeader
+
+        let failingResponse = try drop.respond(to: failingRequest)
+
+        XCTAssertEqual(failingResponse.status, .unauthorized)
     }
 }
 
