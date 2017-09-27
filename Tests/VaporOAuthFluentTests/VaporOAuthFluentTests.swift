@@ -77,7 +77,7 @@ class VaporOAuthFluentTests: XCTestCase {
     }
     
     override func tearDown() {
-        try! drop.database?.revertAll([OAuthClient.self, OAuthUser.self, OAuthCode.self, AccessToken.self, RefreshToken.self])
+        try! drop.database?.revertAll([OAuthClient.self, OAuthUser.self, OAuthCode.self, AccessToken.self, RefreshToken.self, OAuthResourceServer.self])
     }
     
     // MARK: - Tests
